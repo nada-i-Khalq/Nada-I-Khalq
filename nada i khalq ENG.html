@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nada-i-Khalq | Daily Newspaper</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ec 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        
+        /* Banner style */
+        .banner {
+            height: 200px;
+            background: url('https://images.unsplash.com/photo-1588681664899-f142ff2dc9b1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+            color: white;
+            text-align: center;
+            position: relative;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .banner::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .banner-content {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+        }
+        
+        .banner h1 {
+            font-size: 3.8rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        .banner p {
+            font-size: 1.3rem;
+            margin-top: 5px;
+            opacity: 0.9;
+            color: #fff;
+        }
+        
+        /* Date bar */
+        .date-bar {
+            background: linear-gradient(to right, #daa520, #b8860b);
+            color: #333;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .date-bar::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, #8b0000, #daa520);
+        }
+        
+        .date-bar h2 {
+            font-size: 1.6rem;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+            direction: rtl; /* Urdu direction for date */
+        }
+        
+        .prev-days {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .calendar-toggle {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(to right, #8b0000, #a52a2a);
+            color: white;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            direction: rtl; /* Urdu direction for button */
+        }
+        
+        .calendar-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #a52a2a, #8b0000);
+        }
+        
+        /* Calendar style */
+        .calendar-container {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 340px;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .calendar-month {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #8b0000;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .calendar-nav button {
+            background: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #8b0000;
+            margin: 0 5px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .calendar-nav button:hover {
+            background: #8b0000;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #8b0000;
+            font-size: 1rem;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+        
+        .calendar-day {
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .calendar-day:hover {
+            background-color: #f9f9f9;
+            transform: scale(1.05);
+        }
+        
+        .calendar-day.available {
+            background-color: #f8f8f8;
+            color: #333;
+            border: 1px solid #eee;
+        }
+        
+        .calendar-day.unavailable {
+            color: #ddd;
+            cursor: not-allowed;
+            background-color: #fafafa;
+        }
+        
+        .calendar-day.today {
+            background: linear-gradient(to bottom, #daa520, #b8860b);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .calendar-day.selected {
+            background: linear-gradient(to bottom, #8b0000, #a52a2a);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Ads and featured page */
+        .main-content {
+            display: flex;
+            margin-bottom: 30px;
+            gap: 25px;
+        }
+        
+        .ad-column {
+            width: 200px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ad-column h3 {
+            color: #8b0000;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #daa520;
+            padding-bottom: 8px;
+            width: 100%;
+        }
+        
+        .ad-placeholder {
+            width: 160px;
+            height: 600px;
+            background: linear-gradient(45deg, #f8fafc, #edf2f7);
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #718096;
+            font-size: 1rem;
+            text-align: center;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .featured-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .featured-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            padding: 10px 18px;
+            background: linear-gradient(to right, #8b0000, #a52a2a);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .page-indicator {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #8b0000;
+        }
+        
+        .featured-page {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .featured-page:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .featured-page img {
+            width: 100%;
+            display: block;
+            border-bottom: 3px solid #8b0000;
+        }
+        
+        .page-info {
+            padding: 15px;
+            background: linear-gradient(to right, #f9f9f9, #f0f0f0);
+            text-align: center;
+            font-weight: bold;
+            color: #8b0000;
+            font-size: 1.2rem;
+        }
+        
+        /* Page thumbnails */
+        .page-thumbnails {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .thumbnail {
+            width: 130px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .thumbnail:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+            border-color: #daa520;
+        }
+        
+        .thumbnail.active {
+            border-color: #8b0000;
+            transform: translateY(-8px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .thumbnail img {
+            width: 100%;
+            display: block;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+        
+        .thumbnail:hover img {
+            transform: scale(1.05);
+        }
+        
+        .thumbnail p {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 8px;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px;
+            border-radius: 4px;
+        }
+        
+        .page-number {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: #8b0000;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Footer */
+        footer {
+            background: linear-gradient(to right, #8b0000, #a52a2a);
+            color: white;
+            padding: 30px 0 20px;
+            margin-top: 40px;
+            border-top: 5px solid #daa520;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #daa520;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: block;
+            padding: 5px 0;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            padding-left: 10px;
+        }
+        
+        .contact-info p {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.05rem;
+            color: #e0e0e0;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .ad-column {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-around;
+            }
+            
+            .ad-placeholder {
+                width: 150px;
+                height: 250px;
+            }
+            
+            .banner h1 {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .banner h1 {
+                font-size: 2.5rem;
+            }
+            
+            .banner {
+                height: 150px;
+            }
+            
+            .date-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .ad-column {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .thumbnail {
+                width: 100px;
+            }
+            
+            .featured-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .calendar-container {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner Section -->
+    <div class="banner">
+        <div class="banner-content">
+            <h1>Nada-i-Khalq</h1>
+            <p>Voice of the People | People's Newspaper | People's Representative</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Date Bar -->
+        <div class="date-bar">
+            <div class="current-date">
+                <h2 dir="rtl"><i class="fas fa-newspaper"></i> آج کا اخبار: جمعرات، 29 جون 2025</h2>
+            </div>
+            <div class="prev-days">
+                <button class="calendar-toggle">
+                    <i class="fas fa-calendar-alt"></i> گزشتہ اخبارات دیکھیں
+                </button>
+                
+                <!-- Calendar Container -->
+                <div class="calendar-container" id="calendar">
+                    <div class="calendar-header">
+                        <div class="calendar-nav">
+                            <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                        </div>
+                        <div class="calendar-month" id="current-month">June 2025</div>
+                        <div class="calendar-nav">
+                            <button id="next-month"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-weekdays">
+                        <div>S</div>
+                        <div>M</div>
+                        <div>T</div>
+                        <div>W</div>
+                        <div>T</div>
+                        <div>F</div>
+                        <div>S</div>
+                    </div>
+                    
+                    <div class="calendar-days" id="calendar-days">
+                        <!-- Calendar days will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Featured Page and Ads -->
+        <div class="main-content">
+            <!-- Left Ad -->
+            <div class="ad-column">
+                <h3>Advertisements</h3>
+                <div class="ad-placeholder">Google Ad (300x600)</div>
+                <div class="ad-placeholder">Advertisement (300x250)</div>
+            </div>
+            
+            <!-- Featured Page Section -->
+            <div class="featured-section">
+                <!-- Control Bar -->
+                <div class="featured-controls">
+                    <div class="nav-buttons">
+                        <button class="nav-btn" id="prevBtn"><i class="fas fa-arrow-left"></i> Previous</button>
+                        <button class="nav-btn" id="nextBtn">Next <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    <div class="page-indicator">
+                        Page: <span id="currentPage">1</span> / 8
+                    </div>
+                </div>
+                
+                <!-- Featured Page -->
+                <div class="featured-page">
+                    <img src="https://via.placeholder.com/900x1200/f5f5f5/333333?text=Nada-i-Khalq+Page+1+29+June+2025" alt="Newspaper Featured Page" id="featuredImage">
+                    <div class="page-info">
+                        <p>Page Number: <span id="currentPageNum">1</span> | June 29, 2025</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Ad -->
+            <div class="ad-column">
+                <h3>Advertisements</h3>
+                <div class="ad-placeholder">Advertisement (300x250)</div>
+                <div class="ad-placeholder">Google Ad (300x600)</div>
+            </div>
+        </div>
+        
+        <!-- Page Thumbnails -->
+        <div class="page-thumbnails">
+            <div class="thumbnail active" data-page="1">
+                <div class="page-number">1</div>
+                <img src="https://via.placeholder.com/130x180/f5f5f5/333333?text=Page+1" alt="Page 1">
+                <p>Headlines</p>
+            </div>
+            <div class="thumbnail" data-page="2">
+                <div class="page-number">2</div>
+                <img src="https://via.placeholder.com/130x180/f5f5f5/333333?text=Page+2" alt="Page 2">
+                <p>National News</p>
+            </div>
+            <div class="thumbnail" data-page="3">
+                <div class="page-number">3</div>
+                <img src="https://via.placeholder.com/130x180/f5f5f5/333333?text=Page+3" alt="Page 3">
+                <p>International</p>
+            </div>
+            <div class="thumbnail" data-page="4">
+                <div class="page-number">4</div>
+                <img src="https://via.placeholder.com/130x180/f5f5f5/333333?text=Page+4" alt="Page 4">
+                <p>Editorial</p>
+            </div>
+            <div class="thumbnail" data-page="5">
+                <div class="page-number">5</div>
+                <img src="https://via.placeholder.com/130x180/f5f5f5/333333?text=Page+5" alt="Page 5">
+                <p>Sports</p>
+            </div>
+            <div class="thumbnail" data-page="6">
+                <div class="page-number">6</div>
+                <img src="https://via.placeholder.com/130x180/f5f5f5/333333?text=Page+6" alt="Page 6">
+                <p>Business</p>
+            </div>
+            <div class="thumbnail" data-page="7">
+                <div class="page-number">7</div>
+                <img src="https://via.placeholder.com/130x180/f5f5f5/333333?text=Page+7" alt="Page 7">
+                <p>Health</p>
+            </div>
+            <div class="thumbnail" data-page="8">
+                <div class="page-number">8</div>
+                <img src="https://via.placeholder.com/130x180/f5f5f5/333333?text=Page+8" alt="Page 8">
+                <p>Culture</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Nada-i-Khalq</h3>
+                    <p>Voice of the people, representative of the people. Our mission is fact-based journalism, unbiased analysis and highlighting public issues.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Important Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Homepage</a></li>
+                        <li><a href="#">Today's Newspaper</a></li>
+                        <li><a href="#">Previous Issues</a></li>
+                        <li><a href="#">Membership</a></li>
+                        <li><a href="#">Advertisements</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <div class="contact-info">
+                        <p><i class="fas fa-map-marker-alt"></i> Ali Shopping Center Main Bazaar Haripur Hazara (KPK)</p>
+                        <p><i class="fas fa-phone"></i> 03239807767</p>
+                        <p><i class="fas fa-envelope"></i> info@nadaikhalq.com</p>
+                        <p><i class="fas fa-clock"></i> 8 AM to 8 PM</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>© 2025 Nada-i-Khalq. All rights reserved. | All news are fact-based</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Calendar functionality
+        const calendarContainer = document.getElementById('calendar');
+        const calendarDays = document.getElementById('calendar-days');
+        const currentMonthElement = document.getElementById('current-month');
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const calendarToggle = document.querySelector('.calendar-toggle');
+        
+        // Current date
+        const today = new Date(2025, 5, 29); // June 2025 (month starts at 0)
+        let currentMonth = today.getMonth();
+        let currentYear = today.getFullYear();
+        
+        // Month names
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        
+        // Calendar toggle function
+        calendarToggle.addEventListener('click', function() {
+            if (calendarContainer.style.display === 'block') {
+                calendarContainer.style.display = 'none';
+            } else {
+                calendarContainer.style.display = 'block';
+                generateCalendar(currentMonth, currentYear);
+            }
+        });
+        
+        // Generate calendar function
+        function generateCalendar(month, year) {
+            // Update month and year
+            currentMonthElement.textContent = `${monthNames[month]} ${year}`;
+            
+            // Clear calendar days
+            calendarDays.innerHTML = '';
+            
+            // First day of month
+            const firstDay = new Date(year, month, 1);
+            
+            // Last day of month
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // Day of week for first day
+            const firstDayOfWeek = firstDay.getDay();
+            
+            // Fill empty spaces
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.classList.add('calendar-day', 'unavailable');
+                calendarDays.appendChild(emptyDay);
+            }
+            
+            // Generate all days of month
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('calendar-day', 'available');
+                dayElement.textContent = day;
+                
+                // Highlight today
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // Click event for past newspapers
+                if (day <= today.getDate() || month < today.getMonth() || year < today.getFullYear()) {
+                    dayElement.addEventListener('click', function() {
+                        // Remove all selected classes
+                        document.querySelectorAll('.calendar-day').forEach(day => {
+                            day.classList.remove('selected');
+                        });
+                        
+                        // Highlight selected day
+                        this.classList.add('selected');
+                        
+                        // Load newspaper
+                        loadNewspaper(day, month, year);
+                    });
+                } else {
+                    dayElement.classList.add('unavailable');
+                }
+                
+                calendarDays.appendChild(dayElement);
+            }
+        }
+        
+        // Load newspaper function
+        function loadNewspaper(day, month, year) {
+            // Update date
+            const dateString = `${day} ${monthNames[month]} ${year}`;
+            document.querySelector('.current-date h2').innerHTML = `<i class="fas fa-newspaper"></i> اخبار: ${day} ${monthNames[month]} ${year}`;
+            
+            // Update featured image
+            document.getElementById('featuredImage').src = `https://via.placeholder.com/900x1200/f5f5f5/333333?text=Nada-i-Khalq+Page+1+${day}+${monthNames[month]}+${year}`;
+            
+            // Update page info
+            document.querySelector('.page-info p').innerHTML = `Page Number: <span id="currentPageNum">1</span> | ${dateString}`;
+            
+            // Close calendar
+            calendarContainer.style.display = 'none';
+        }
+        
+        // Month navigation buttons
+        prevMonthBtn.addEventListener('click', function() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            generateCalendar(currentMonth, currentYear);
+        });
+        
+        nextMonthBtn.addEventListener('click', function() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            generateCalendar(currentMonth, currentYear);
+        });
+        
+        // Thumbnail click functionality
+        document.querySelectorAll('.thumbnail').forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                // Remove active class from all thumbnails
+                document.querySelectorAll('.thumbnail').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Add active class to clicked thumbnail
+                this.classList.add('active');
+                
+                // Get page number
+                const pageNumber = this.getAttribute('data-page');
+                
+                // Update featured image
+                const currentDate = document.querySelector('.current-date h2').textContent.split('اخبار: ')[1];
+                document.getElementById('featuredImage').src = `https://via.placeholder.com/900x1200/f5f5f5/333333?text=Nada-i-Khalq+Page+${pageNumber}+${currentDate}`;
+                
+                // Update page number
+                document.getElementById('currentPage').textContent = pageNumber;
+                document.getElementById('currentPageNum').textContent = pageNumber;
+            });
+        });
+        
+        // Previous/next buttons
+        document.getElementById('prevBtn').addEventListener('click', function() {
+            const currentPage = parseInt(document.getElementById('currentPage').textContent);
+            const prevPage = currentPage > 1 ? currentPage - 1 : 8;
+            
+            // Select the corresponding thumbnail
+            document.querySelector(`.thumbnail[data-page="${prevPage}"]`).click();
+        });
+        
+        document.getElementById('nextBtn').addEventListener('click', function() {
+            const currentPage = parseInt(document.getElementById('currentPage').textContent);
+            const nextPage = currentPage < 8 ? currentPage + 1 : 1;
+            
+            // Select the corresponding thumbnail
+            document.querySelector(`.thumbnail[data-page="${nextPage}"]`).click();
+        });
+        
+        // Close calendar when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.prev-days') && !event.target.closest('.calendar-container') && calendarContainer.style.display === 'block') {
+                calendarContainer.style.display = 'none';
+            }
+        });
+        
+        // Generate initial calendar
+        generateCalendar(currentMonth, currentYear);
+    </script>
+</body>
+</html>
